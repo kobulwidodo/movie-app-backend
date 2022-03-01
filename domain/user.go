@@ -16,6 +16,7 @@ type User struct {
 
 type UserUsecase interface {
 	Register(input entity.CreateUserInput) (User, error)
+	Login(input entity.LoginInput) (User, error)
 }
 
 type UserRepository interface {
