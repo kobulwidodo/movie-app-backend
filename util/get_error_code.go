@@ -17,6 +17,10 @@ func GetErrorCode(err error) int {
 		return http.StatusInternalServerError
 	case domain.ErrInputBinding:
 		return http.StatusUnprocessableEntity
+	case domain.ErrPassNotMatch:
+		return http.StatusUnauthorized
+	case domain.ErrNotFound:
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}
