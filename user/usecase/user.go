@@ -40,3 +40,22 @@ func (s *userUsecase) Register(input entity.CreateUserInput) (domain.User, error
 
 	return newUser, nil
 }
+
+func (s *userUsecase) Login(input entity.LoginInput) (domain.User, error) {
+	var user domain.User
+	user, err := s.userRepository.GetByEmail(input.Email)
+	if err != nil {
+		return user, domain.ErrInternalServerError
+	}
+
+	if user.ID == 0 {
+		return domain.User{}, domain.ErrNotFound
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+	if err != nil {
+		return user, domain.ErrPassNotMatch
+	}
+
+	return user, nil
+}
