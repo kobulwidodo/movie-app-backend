@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	_authUsecase "movie-app/auth/usecase"
 	"movie-app/domain"
 	_userHttpDelivery "movie-app/user/delivery/http"
 	"movie-app/user/repository"
-	"movie-app/user/usecase"
+	_userUsecase "movie-app/user/usecase"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -28,9 +29,11 @@ func main() {
 
 	r := gin.Default()
 
+	authUsecase := _authUsecase.NewAuthUsecase()
+
 	userRepository := repository.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepository)
-	_userHttpDelivery.NewUserHandler(r, userUsecase)
+	userUsecase := _userUsecase.NewUserUsecase(userRepository)
+	_userHttpDelivery.NewUserHandler(r, userUsecase, authUsecase)
 
 	r.Run()
 }
