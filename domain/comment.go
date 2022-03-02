@@ -25,9 +25,11 @@ type Series struct {
 type CommentRepository interface {
 	Create(comment Comment) (Comment, error)
 	GetByUserId(userId uint) ([]Comment, error)
+	GetBySeriesId(seriesId string) ([]Comment, error)
 }
 
 type CommentUsecase interface {
 	Create(input _movieEntity.CreateCommentInput, inputUril _movieEntity.CreateCommentUri) (Comment, error)
 	GetCommentByUserId(userId uint) ([]Comment, error)
+	GetCommentBySeriesId(seriesId string) ([]Comment, error)
 }
