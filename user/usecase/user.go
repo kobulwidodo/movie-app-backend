@@ -59,3 +59,13 @@ func (s *userUsecase) Login(input entity.LoginInput) (domain.User, error) {
 
 	return user, nil
 }
+
+func (s *userUsecase) GetUserById(userId uint) (domain.User, error) {
+	var user domain.User
+	user, err := s.userRepository.GetById(userId)
+	if err != nil {
+		return user, domain.ErrNotFound
+	}
+
+	return user, nil
+}
