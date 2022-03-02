@@ -6,7 +6,7 @@ import (
 	_authUsecase "movie-app/auth/usecase"
 	"movie-app/domain"
 	_userHttpDelivery "movie-app/user/delivery/http"
-	"movie-app/user/repository"
+	_userRepository "movie-app/user/repository"
 	_userUsecase "movie-app/user/usecase"
 	"os"
 
@@ -31,7 +31,7 @@ func main() {
 
 	authUsecase := _authUsecase.NewAuthUsecase()
 
-	userRepository := repository.NewUserRepository(db)
+	userRepository := _userRepository.NewUserRepository(db)
 	userUsecase := _userUsecase.NewUserUsecase(userRepository)
 	_userHttpDelivery.NewUserHandler(r, userUsecase, authUsecase)
 
