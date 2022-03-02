@@ -13,9 +13,10 @@ type CommentHandler struct {
 	CommentUsecase domain.CommentUsecase
 }
 
-func NewCommentHandler(r *gin.Engine, cu domain.CommentUsecase) {
+func NewCommentHandler(r *gin.Engine, cu domain.CommentUsecase, jwtMiddleware gin.HandlerFunc) {
 	handler := &CommentHandler{CommentUsecase: cu}
-	r.POST("/comment/:type/:seriesId", handler.Create)
+	r.POST("/comment/:type/:seriesId", jwtMiddleware, handler.Create)
+	r.GET("/comment/:id", handler.GetCommentByUserId)
 }
 
 func (h *CommentHandler) Create(c *gin.Context) {
@@ -30,4 +31,32 @@ func (h *CommentHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, &utils.Response{Message: err.Error()})
 		return
 	}
+
+	userLoggedin := c.MustGet("userLoggedin").(domain.User)
+	input.UserId = userLoggedin.ID
+
+	var newComment domain.Comment
+	newComment, err := h.CommentUsecase.Create(input, inputUri)
+	if err != nil {
+		c.JSON(utils.GetErrorCode(err), &utils.Response{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, &utils.Response{Data: &entity.CommentOutput{Id: int(newComment.ID), Text: newComment.Text, CreatedAt: newComment.CreatedAt.String()}, Message: "comment has ben created"})
+}
+
+func (h *CommentHandler) GetCommentByUserId(c *gin.Context) {
+	var inputUri entity.GetCommentByIdUri
+	if err := c.ShouldBindUri(&inputUri); err != nil {
+		c.JSON(http.StatusBadRequest, &utils.Response{Message: err.Error()})
+		return
+	}
+
+	comments, err := h.CommentUsecase.GetCommentByUserId(uint(inputUri.Id))
+	if err != nil {
+		c.JSON(utils.GetErrorCode(err), err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, &utils.Response{Data: CommentsResponse(comments), Message: "succesfully get comments"})
 }
