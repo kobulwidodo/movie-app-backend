@@ -39,3 +39,20 @@ func (r *commentRepository) GetBySeriesId(seriesId string) ([]domain.Comment, er
 
 	return comments, nil
 }
+
+func (r *commentRepository) GetById(id uint) (domain.Comment, error) {
+	var comment domain.Comment
+	if err := r.db.Where("id = ?", id).Find(&comment).Error; err != nil {
+		return comment, err
+	}
+
+	return comment, nil
+}
+
+func (r *commentRepository) Delete(comment domain.Comment) error {
+	if err := r.db.Delete(&comment).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

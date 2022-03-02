@@ -19,6 +19,7 @@ func NewCommentHandler(r *gin.Engine, cu domain.CommentUsecase, jwtMiddleware gi
 	r.POST("/comment/:type/:seriesId", jwtMiddleware, handler.Create)
 	r.GET("/comment/user/:id", handler.GetCommentByUserId)
 	r.GET("/comment/:id", handler.GetCommentBySeriesId)
+	r.DELETE("/comment/:id", jwtMiddleware, handler.DeleteComment)
 }
 
 func (h *CommentHandler) Create(c *gin.Context) {
@@ -77,4 +78,21 @@ func (h *CommentHandler) GetCommentBySeriesId(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, &utils.Response{Data: CommentsSeriesResponse(comments), Message: "successfully get comments"})
+}
+
+func (h *CommentHandler) DeleteComment(c *gin.Context) {
+	var inputUri entity.GetCommentByIdUri
+	if err := c.ShouldBindUri(&inputUri); err != nil {
+		c.JSON(http.StatusBadRequest, &utils.Response{Message: err.Error()})
+		return
+	}
+
+	userLoggedin := c.MustGet("userLoggedin").(domain.User)
+
+	if err := h.CommentUsecase.DeleteComment(inputUri, userLoggedin.ID); err != nil {
+		c.JSON(utils.GetErrorCode(err), &utils.Response{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, &utils.Response{Message: "successfully delete a comment"})
 }

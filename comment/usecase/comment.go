@@ -98,3 +98,24 @@ func (s *commentUsecase) GetCommentBySeriesId(seriesId string) ([]domain.Comment
 
 	return comments, nil
 }
+
+func (s *commentUsecase) DeleteComment(input entity.GetCommentByIdUri, userId uint) error {
+	comment, err := s.commentRepository.GetById(uint(input.Id))
+	if err != nil {
+		return err
+	}
+
+	if comment.ID == 0 {
+		return domain.ErrNotFound
+	}
+
+	if comment.UserId != userId {
+		return domain.ErrForbidden
+	}
+
+	if err := s.commentRepository.Delete(comment); err != nil {
+		return err
+	}
+
+	return nil
+}
