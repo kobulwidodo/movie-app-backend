@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"movie-app/comment/entity"
 	"movie-app/domain"
@@ -61,7 +60,6 @@ func (s *commentUsecase) GetCommentByUserId(userId uint) ([]domain.Comment, erro
 		} else {
 			url = "/tv/" + comment.SeriesId + "?api_key=6386ea8d1021b8ae5f21896f87ee2a09"
 		}
-		fmt.Println(url)
 		res, err := http.Get("https://api.themoviedb.org/3" + url)
 		if err != nil {
 			return comments, err

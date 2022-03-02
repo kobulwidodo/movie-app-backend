@@ -13,13 +13,13 @@ type Comment struct {
 	IsMovie  bool
 	UserId   uint
 	User     User
-	Series   series `gorm:"-"`
+	Series   Series `gorm:"-"`
 }
 
-type series struct {
-	Title       string
-	Year        string
-	ImagePoster string
+type Series struct {
+	Title       string `json:"title"`
+	Year        string `json:"year"`
+	ImagePoster string `json:"image_poster"`
 }
 
 type CommentRepository interface {

@@ -3,22 +3,17 @@ package http
 import "movie-app/domain"
 
 type commentResponse struct {
-	Id        int    `json:"id"`
-	Text      string `json:"text"`
-	CreatedAt string `json:"created_at"`
-	User      user   `json:"user"`
-	Series    series `json:"series"`
+	Id        int           `json:"id"`
+	Text      string        `json:"text"`
+	SeriesId  string        `json:"series_id"`
+	Type      string        `json:"type"`
+	CreatedAt string        `json:"created_at"`
+	User      user          `json:"user"`
+	Series    domain.Series `json:"series"`
 }
 
 type user struct {
 	Name string `json:"name"`
-}
-
-type series struct {
-	Id          string `json:"id"`
-	Title       string `json:"title"`
-	Year        string `json:"year"`
-	ImagePoster string `json:"image_poster"`
 }
 
 func CommentsResponse(comments []domain.Comment) []commentResponse {
@@ -33,18 +28,20 @@ func CommentResponse(comment domain.Comment) commentResponse {
 	user := user{
 		Name: comment.User.Name,
 	}
-	series := series{
-		Id:          comment.SeriesId,
-		Title:       comment.Series.Title,
-		Year:        comment.Series.Year,
-		ImagePoster: comment.Series.ImagePoster,
+	var _type string
+	if comment.IsMovie {
+		_type = "movie"
+	} else {
+		_type = "tv"
 	}
 	commentRes := commentResponse{
 		Id:        int(comment.ID),
 		Text:      comment.Text,
+		SeriesId:  comment.SeriesId,
+		Type:      _type,
 		CreatedAt: comment.CreatedAt.String(),
 		User:      user,
-		Series:    series,
+		Series:    comment.Series,
 	}
 	return commentRes
 }
