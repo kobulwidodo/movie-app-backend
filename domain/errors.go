@@ -8,4 +8,5 @@ var (
 	ErrInputBinding        = errors.New("wrong parameter")
 	ErrNotFound            = errors.New("credential not found")
 	ErrPassNotMatch        = errors.New("your login credentials dont match in our system")
+	ErrBadRequest          = errors.New("bad request")
 )
