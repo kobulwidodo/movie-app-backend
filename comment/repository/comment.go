@@ -21,3 +21,12 @@ func (r *commentRepository) Create(comment domain.Comment) (domain.Comment, erro
 
 	return comment, nil
 }
+
+func (r *commentRepository) GetByUserId(userId uint) ([]domain.Comment, error) {
+	var comments []domain.Comment
+	if err := r.db.Preload("User").Where("user_id = ?", userId).Find(&comments).Error; err != nil {
+		return comments, err
+	}
+
+	return comments, nil
+}
