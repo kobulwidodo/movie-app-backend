@@ -88,3 +88,13 @@ func (s *commentUsecase) GetCommentByUserId(userId uint) ([]domain.Comment, erro
 
 	return newComments, nil
 }
+
+func (s *commentUsecase) GetCommentBySeriesId(seriesId string) ([]domain.Comment, error) {
+	var comments []domain.Comment
+	comments, err := s.commentRepository.GetBySeriesId(seriesId)
+	if err != nil {
+		return comments, err
+	}
+
+	return comments, nil
+}
