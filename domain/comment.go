@@ -1,7 +1,7 @@
 package domain
 
 import (
-	_movieEntity "movie-app/comment/entity"
+	_commentEntity "movie-app/comment/entity"
 
 	"gorm.io/gorm"
 )
@@ -26,10 +26,13 @@ type CommentRepository interface {
 	Create(comment Comment) (Comment, error)
 	GetByUserId(userId uint) ([]Comment, error)
 	GetBySeriesId(seriesId string) ([]Comment, error)
+	GetById(id uint) (Comment, error)
+	Delete(comment Comment) error
 }
 
 type CommentUsecase interface {
-	Create(input _movieEntity.CreateCommentInput, inputUril _movieEntity.CreateCommentUri) (Comment, error)
+	Create(input _commentEntity.CreateCommentInput, inputUri _commentEntity.CreateCommentUri) (Comment, error)
 	GetCommentByUserId(userId uint) ([]Comment, error)
 	GetCommentBySeriesId(seriesId string) ([]Comment, error)
+	DeleteComment(input _commentEntity.GetCommentByIdUri, userId uint) error
 }
