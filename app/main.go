@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"log"
 	_authUsecase "movie-app/auth/usecase"
+	_commentHttpDelivery "movie-app/comment/delivery/http"
+	_commentRepository "movie-app/comment/repository"
+	_commentUsecase "movie-app/comment/usecase"
 	"movie-app/domain"
+	"movie-app/middlewares"
 	_userHttpDelivery "movie-app/user/delivery/http"
 	_userRepository "movie-app/user/repository"
 	_userUsecase "movie-app/user/usecase"
@@ -33,7 +37,12 @@ func main() {
 
 	userRepository := _userRepository.NewUserRepository(db)
 	userUsecase := _userUsecase.NewUserUsecase(userRepository)
+	jwtMiddleware := middlewares.AuthMiddleware(authUsecase, userUsecase)
 	_userHttpDelivery.NewUserHandler(r, userUsecase, authUsecase)
+
+	commentRepository := _commentRepository.NewCommentRepository(db)
+	commentUsecase := _commentUsecase.NewCommentRepository(commentRepository)
+	_commentHttpDelivery.NewCommentHandler(r, commentUsecase, jwtMiddleware)
 
 	r.Run()
 }
@@ -52,7 +61,7 @@ func initDb() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := DB.AutoMigrate(&domain.User{}); err != nil {
+	if err := DB.AutoMigrate(&domain.User{}, &domain.Comment{}); err != nil {
 		log.Fatal(err.Error())
 		return nil, err
 	}
