@@ -5,6 +5,7 @@ import (
 	"movie-app/domain"
 	"movie-app/utils"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +17,8 @@ type CommentHandler struct {
 func NewCommentHandler(r *gin.Engine, cu domain.CommentUsecase, jwtMiddleware gin.HandlerFunc) {
 	handler := &CommentHandler{CommentUsecase: cu}
 	r.POST("/comment/:type/:seriesId", jwtMiddleware, handler.Create)
-	r.GET("/comment/:id", handler.GetCommentByUserId)
+	r.GET("/comment/user/:id", handler.GetCommentByUserId)
+	r.GET("/comment/:id", handler.GetCommentBySeriesId)
 }
 
 func (h *CommentHandler) Create(c *gin.Context) {
@@ -58,5 +60,21 @@ func (h *CommentHandler) GetCommentByUserId(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, &utils.Response{Data: CommentsResponse(comments), Message: "succesfully get comments"})
+	c.JSON(http.StatusOK, &utils.Response{Data: CommentsResponse(comments), Message: "successfully get comments"})
+}
+
+func (h *CommentHandler) GetCommentBySeriesId(c *gin.Context) {
+	var inputUri entity.GetCommentByIdUri
+	if err := c.ShouldBindUri(&inputUri); err != nil {
+		c.JSON(http.StatusBadRequest, &utils.Response{Message: err.Error()})
+		return
+	}
+
+	comments, err := h.CommentUsecase.GetCommentBySeriesId(strconv.Itoa(inputUri.Id))
+	if err != nil {
+		c.JSON(utils.GetErrorCode(err), &utils.Response{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, &utils.Response{Data: CommentsSeriesResponse(comments), Message: "successfully get comments"})
 }
