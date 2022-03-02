@@ -23,6 +23,8 @@ func GetErrorCode(err error) int {
 		return http.StatusNotFound
 	case domain.ErrBadRequest:
 		return http.StatusBadRequest
+	case domain.ErrForbidden:
+		return http.StatusForbidden
 	default:
 		return http.StatusInternalServerError
 	}
