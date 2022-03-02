@@ -1,4 +1,4 @@
-package util
+package utils
 
 type Response struct {
 	Data    interface{} `json:"data"`
