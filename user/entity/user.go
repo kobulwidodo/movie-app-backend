@@ -11,10 +11,3 @@ type LoginInput struct {
 	Email    string `binding:"required"`
 	Password string `binding:"required"`
 }
-
-type GetUser struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Bio   string `json:"bio"`
-	Token string `json:"token"`
-}

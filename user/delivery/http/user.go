@@ -33,7 +33,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, &utils.Response{Data: &entity.GetUser{Name: newUser.Name, Email: newUser.Email, Bio: newUser.Bio}, Message: "successfully created a user"})
+	c.JSON(http.StatusCreated, &utils.Response{Data: UserAuthResponse(newUser, ""), Message: "successfully created a user"})
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
@@ -56,5 +56,5 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, &utils.Response{Data: &entity.GetUser{Name: userLogged.Name, Email: userLogged.Email, Bio: userLogged.Bio, Token: token}, Message: "Success Login"})
+	c.JSON(http.StatusOK, &utils.Response{Data: UserAuthResponse(userLogged, token), Message: "Success Login"})
 }
