@@ -16,8 +16,11 @@ type UserHandler struct {
 
 func NewUserHandler(r *gin.Engine, uu domain.UserUsecase, au domain.AuthUsecase) {
 	handler := &UserHandler{UserUsecase: uu, AuthUsecase: au}
-	r.POST("/register", handler.Register)
-	r.POST("/login", handler.Login)
+	api := r.Group("/auth")
+	{
+		api.POST("/register", handler.Register)
+		api.POST("/login", handler.Login)
+	}
 }
 
 func (h *UserHandler) Register(c *gin.Context) {

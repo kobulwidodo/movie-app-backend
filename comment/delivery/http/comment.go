@@ -16,10 +16,13 @@ type CommentHandler struct {
 
 func NewCommentHandler(r *gin.Engine, cu domain.CommentUsecase, jwtMiddleware gin.HandlerFunc) {
 	handler := &CommentHandler{CommentUsecase: cu}
-	r.POST("/comment/:type/:seriesId", jwtMiddleware, handler.Create)
-	r.GET("/comment/user/:id", handler.GetCommentByUserId)
-	r.GET("/comment/:id", handler.GetCommentBySeriesId)
-	r.DELETE("/comment/:id", jwtMiddleware, handler.DeleteComment)
+	api := r.Group("/api/comment")
+	{
+		api.POST("/:type/:seriesId", jwtMiddleware, handler.Create)
+		api.GET("/user/:id", handler.GetCommentByUserId)
+		api.GET("/:id", handler.GetCommentBySeriesId)
+		api.DELETE("/:id", jwtMiddleware, handler.DeleteComment)
+	}
 }
 
 func (h *CommentHandler) Create(c *gin.Context) {
