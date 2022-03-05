@@ -10,7 +10,16 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func AuthMiddleware(authUsecase domain.AuthUsecase, userUsecase domain.UserUsecase) gin.HandlerFunc {
+type AuthMiddleware struct {
+	authUsecase domain.AuthUsecase
+	userUsecase domain.UserUsecase
+}
+
+func NewAuthMiddleware(au domain.AuthUsecase, uu domain.UserUsecase) gin.HandlerFunc {
+	return (&AuthMiddleware{authUsecase: au, userUsecase: uu}).Handle()
+}
+
+func (m *AuthMiddleware) Handle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if !strings.Contains(authHeader, "Bearer") {
@@ -24,7 +33,7 @@ func AuthMiddleware(authUsecase domain.AuthUsecase, userUsecase domain.UserUseca
 			tokenString = arrayToken[1]
 		}
 
-		token, err := authUsecase.ValidateToken(tokenString)
+		token, err := m.authUsecase.ValidateToken(tokenString)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &utils.Response{Message: "token invalid"})
 			return
@@ -38,7 +47,7 @@ func AuthMiddleware(authUsecase domain.AuthUsecase, userUsecase domain.UserUseca
 
 		userId := uint(claim["user_id"].(float64))
 		var user domain.User
-		user, err = userUsecase.GetUserById(userId)
+		user, err = m.userUsecase.GetUserById(userId)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, &utils.Response{Message: "failed to get user data"})
 			return

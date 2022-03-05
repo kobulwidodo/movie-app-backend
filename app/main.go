@@ -37,7 +37,7 @@ func main() {
 
 	userRepository := _userRepository.NewUserRepository(db)
 	userUsecase := _userUsecase.NewUserUsecase(userRepository)
-	jwtMiddleware := middlewares.AuthMiddleware(authUsecase, userUsecase)
+	jwtMiddleware := middlewares.NewAuthMiddleware(authUsecase, userUsecase)
 	_userHttpDelivery.NewUserHandler(r, userUsecase, authUsecase)
 
 	commentRepository := _commentRepository.NewCommentRepository(db)
