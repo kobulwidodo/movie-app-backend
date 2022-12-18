@@ -14,12 +14,17 @@ type UserHandler struct {
 	AuthUsecase domain.AuthUsecase
 }
 
-func NewUserHandler(r *gin.Engine, uu domain.UserUsecase, au domain.AuthUsecase) {
+func NewUserHandler(r *gin.Engine, uu domain.UserUsecase, au domain.AuthUsecase, jwtMiddleware gin.HandlerFunc) {
 	handler := &UserHandler{UserUsecase: uu, AuthUsecase: au}
 	api := r.Group("/auth")
 	{
 		api.POST("/register", handler.Register)
 		api.POST("/login", handler.Login)
+	}
+	api = r.Group("/user")
+	{
+		api.PUT("/bio", jwtMiddleware, handler.UpdateBio)
+		api.GET("/me", jwtMiddleware, handler.GetMe)
 	}
 }
 
@@ -60,4 +65,35 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, &utils.Response{Data: UserAuthResponse(userLogged, token), Message: "Success Login"})
+}
+
+func (h *UserHandler) UpdateBio(c *gin.Context) {
+	var input entity.UpdateBioInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, &utils.Response{Message: err.Error()})
+		return
+	}
+
+	userLoggedin := c.MustGet("userLoggedin").(domain.User)
+	input.UserId = userLoggedin.ID
+
+	newUser, err := h.UserUsecase.UpdateBio(input)
+	if err != nil {
+		c.JSON(utils.GetErrorCode(err), &utils.Response{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, &utils.Response{Message: "successfully update bio", Data: gin.H{"bio": newUser.Bio}})
+}
+
+func (h *UserHandler) GetMe(c *gin.Context) {
+	userLoggedin := c.MustGet("userLoggedin").(domain.User)
+
+	user, err := h.UserUsecase.GetUserById(userLoggedin.ID)
+	if err != nil {
+		c.JSON(utils.GetErrorCode(err), &utils.Response{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, &utils.Response{Message: "successfully get me", Data: gin.H{"data": user}})
 }

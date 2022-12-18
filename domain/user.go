@@ -18,10 +18,12 @@ type UserUsecase interface {
 	Register(input entity.CreateUserInput) (User, error)
 	Login(input entity.LoginInput) (User, error)
 	GetUserById(userId uint) (User, error)
+	UpdateBio(input entity.UpdateBioInput) (User, error)
 }
 
 type UserRepository interface {
 	Create(user User) (User, error)
 	GetByEmail(email string) (User, error)
 	GetById(userId uint) (User, error)
+	Update(user User) (User, error)
 }

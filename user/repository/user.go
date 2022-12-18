@@ -39,3 +39,11 @@ func (r *userRepository) GetById(userId uint) (domain.User, error) {
 
 	return user, nil
 }
+
+func (r *userRepository) Update(user domain.User) (domain.User, error) {
+	if err := r.db.Save(&user).Error; err != nil {
+		return user, err
+	}
+
+	return user, nil
+}

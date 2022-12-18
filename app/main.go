@@ -13,7 +13,9 @@ import (
 	_userRepository "movie-app/user/repository"
 	_userUsecase "movie-app/user/usecase"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -32,13 +34,21 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	authUsecase := _authUsecase.NewAuthUsecase()
 
 	userRepository := _userRepository.NewUserRepository(db)
 	userUsecase := _userUsecase.NewUserUsecase(userRepository)
 	jwtMiddleware := middlewares.NewAuthMiddleware(authUsecase, userUsecase)
-	_userHttpDelivery.NewUserHandler(r, userUsecase, authUsecase)
+	_userHttpDelivery.NewUserHandler(r, userUsecase, authUsecase, jwtMiddleware)
 
 	commentRepository := _commentRepository.NewCommentRepository(db)
 	commentUsecase := _commentUsecase.NewCommentRepository(commentRepository)

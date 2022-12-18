@@ -30,7 +30,7 @@ func (s *userUsecase) Register(input entity.CreateUserInput) (domain.User, error
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: string(passwordHash),
-		Bio:      input.Bio,
+		Bio:      "",
 	}
 
 	newUser, err := s.userRepository.Create(user)
@@ -68,4 +68,24 @@ func (s *userUsecase) GetUserById(userId uint) (domain.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *userUsecase) UpdateBio(input entity.UpdateBioInput) (domain.User, error) {
+	user, err := s.userRepository.GetById(input.UserId)
+	if err != nil {
+		return user, err
+	}
+
+	if user.ID == 0 {
+		return user, domain.ErrNotFound
+	}
+
+	user.Bio = input.Bio
+
+	newUser, err := s.userRepository.Update(user)
+	if err != nil {
+		return user, err
+	}
+
+	return newUser, nil
 }

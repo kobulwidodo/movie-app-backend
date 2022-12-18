@@ -24,7 +24,7 @@ func (r *commentRepository) Create(comment domain.Comment) (domain.Comment, erro
 
 func (r *commentRepository) GetByUserId(userId uint) ([]domain.Comment, error) {
 	var comments []domain.Comment
-	if err := r.db.Preload("User").Where("user_id = ?", userId).Find(&comments).Error; err != nil {
+	if err := r.db.Preload("User").Where("user_id = ?", userId).Order("created_at desc").Limit(5).Find(&comments).Error; err != nil {
 		return comments, err
 	}
 
@@ -33,7 +33,7 @@ func (r *commentRepository) GetByUserId(userId uint) ([]domain.Comment, error) {
 
 func (r *commentRepository) GetBySeriesId(seriesId string) ([]domain.Comment, error) {
 	var comments []domain.Comment
-	if err := r.db.Preload("User").Where("series_id = ?", seriesId).Find(&comments).Error; err != nil {
+	if err := r.db.Preload("User").Where("series_id = ?", seriesId).Order("created_at desc").Limit(5).Find(&comments).Error; err != nil {
 		return comments, err
 	}
 
